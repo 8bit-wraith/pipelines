@@ -477,6 +477,12 @@ async def delete_pipeline(
     pipeline_id = form_data.id
     pipeline_name = PIPELINE_NAMES.get(pipeline_id.split(".")[0], None)
 
+    if pipeline_id not in PIPELINE_MODULES or pipeline_name is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Pipeline {pipeline_id} not found",
+        )
+
     if PIPELINE_MODULES[pipeline_id]:
         if hasattr(PIPELINE_MODULES[pipeline_id], "on_shutdown"):
             await PIPELINE_MODULES[pipeline_id].on_shutdown()
